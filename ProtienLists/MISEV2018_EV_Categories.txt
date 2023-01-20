@@ -1,0 +1,6 @@
+Number	Category
+1	Transmembrane or GPI-anchored proteins associated to plasma membrane and/or endosomes
+2	Cytosolic proteins recovered in EVs
+3	Major components of non-EV co-isolated structures
+4	Transmembrane, lipidbound and soluble proteins associated to other intracellular compartments than PM/endosomes
+5	Secreted proteins recovered with EVs

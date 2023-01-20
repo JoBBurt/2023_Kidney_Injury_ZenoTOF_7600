@@ -1,0 +1,24 @@
+---
+title: "Data_Import_Toolkit"
+author: "Jordan Burton"
+date: "3/17/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+Apolip <- read.delim("Apolipoproteins.txt", stringsAsFactors = F)
+Top10 <- read.delim("Top_10_Blood_Proteins.txt", stringsAsFactors = F)
+PMSEV <- read.delim("Exosome_Protein_Markers.txt", stringsAsFactors = F)
+MISEV2018Cat <- read.delim("MISEV2018_EV_Categories.txt", stringsAsFactors = F)
+Human_MISEV2018Mark <- read.delim("MISEV2018_EV_Markers.txt", stringsAsFactors = F)
+Mouse_MISEV2018Mark <- read.csv("MISEV2018_Mouse_EV_Markers.csv", stringsAsFactors = F)
+```
+
+```{r}
+save.image(file = "Protein_Lists.RData")
+```
+

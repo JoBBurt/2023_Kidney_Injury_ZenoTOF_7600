@@ -1,0 +1,12 @@
+Accession	Description
+P02647	Apolipoprotein A-I OS=Homo sapiens GN=APOA1 PE=1 SV=1 - [APOA1_HUMAN]
+P02652	Apolipoprotein A-II OS=Homo sapiens GN=APOA2 PE=1 SV=1 - [APOA2_HUMAN]
+P06727	Apolipoprotein A-IV OS=Homo sapiens GN=APOA4 PE=1 SV=3 - [APOA4_HUMAN]
+Q6Q788	Apolipoprotein A-V OS=Homo sapiens GN=APOA5 PE=1 SV=1 - [APOA5_HUMAN]
+P04114	Apolipoprotein B-100 OS=Homo sapiens GN=APOB PE=1 SV=2 - [APOB_HUMAN]
+P02654	Apolipoprotein C-I OS=Homo sapiens GN=APOC1 PE=1 SV=1 - [APOC1_HUMAN]
+P02655	Apolipoprotein C-II OS=Homo sapiens GN=APOC2 PE=1 SV=1 - [APOC2_HUMAN]
+P02656	Apolipoprotein C-III OS=Homo sapiens GN=APOC3 PE=1 SV=1 - [APOC3_HUMAN]
+P55056	Apolipoprotein C-IV OS=Homo sapiens GN=APOC4 PE=1 SV=1 - [APOC4_HUMAN]
+P02649	Apolipoprotein E OS=Homo sapiens GN=APOE PE=1 SV=1 - [APOE_HUMAN]
+P08519	Apolipoprotein(a) OS=Homo sapiens GN=LPA PE=1 SV=1 - [APOA_HUMAN]

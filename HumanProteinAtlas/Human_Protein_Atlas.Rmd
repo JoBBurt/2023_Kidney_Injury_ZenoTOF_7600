@@ -1,0 +1,82 @@
+---
+title: "Peptide_Atlas_Figure"
+author: "Jordan Burton"
+date: "3/24/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+library(dplyr)
+library(limma)
+library(kableExtra)
+library(ggpubr)
+library(tidyr)
+library(plotly)
+
+theme_set(theme_bw(base_size = 16))
+```
+
+```{r}
+# Paper = The Human Plasma Proteome Draft of 2017: Building on the Human Plasma PeptideAtlas from Mass Spectrometry and Complementary Assays
+
+## https://db.systemsbiology.net/sbeams/cgi/shortURL?key=jq9pvqke is the database
+## https://db.systemsbiology.net/sbeams/cgi/PeptideAtlas/buildDetails?atlas_build_id=465# build overview
+
+#ProteinAtlas <- read.delim(file="data/Peptide_Atlas_2017/protein_abundance_MS_2017.txt", stringsAsFactors = FALSE)
+#save.image(file = "ProteinAtlas2017.RData")
+load(file = "ProteinAtlas2017.RData")
+load(file = "toolkit/Protein_Lists.Rdata")
+```
+
+```{r}
+p1<- ProteinAtlas %>% 
+ggplot(aes(x = rank(reorder(biosequence_description, -estimated_ng_per_ml)), 
+           y = log10(estimated_ng_per_ml), 
+           text = paste(biosequence_description))) +
+  geom_point(alpha = 1, position = "jitter", size = 3) +
+  xlab("Protein") + ylab("Abundance (log10)")  +
+  xlim(c(0,250)) + ylim(c(0,8)) + 
+  ggtitle("Fractionated Depleted Plasma", "Rank vs. Abundance")
+```
+
+```{r}
+p2<-  ProteinAtlas %>% 
+  ggplot(aes(x = rank(reorder(Accession, -estimated_ng_per_ml)), 
+           y = estimated_ng_per_ml, 
+           text = paste(biosequence_description))) +
+  geom_point(alpha = 1, position = "jitter", size = 1) +
+  xlab("Protein Rank") + ylab("Abundance")  +
+  scale_y_continuous(trans='log10', breaks = c(0.001,1, 1E3, 1E6), labels = c("ng/L","µg/L","mg/L","g/L")) + #
+  xlim(c(1,3100)) + #ylim(c(-100,1E6)) + 
+  ggtitle("Human Protein Atlas 2017", "Publically Accessible Data") +
+  theme(legend.position="none")
+
+p2
+```
+
+3222 proteins have been identified in blood via mass spectrometry.
+
+```{r}
+colors <- c("0" = "black", "1" = "green", "2" = "green", "3" = "red", "4" = "orange", "5" = "green")
+
+  
+p3<- ProteinAtlas %>% 
+full_join(MISEV2018Mark, by = "Accession") %>%
+  mutate_if(is.numeric , replace_na, replace = 0) %>%
+  mutate(Category = as.factor(Category)) %>%
+  ggplot(aes(x = rank(reorder(Accession, -estimated_ng_per_ml)), 
+           y = estimated_ng_per_ml, 
+           text = paste(biosequence_description), 
+           color = Category)) +
+  geom_point(alpha = 1, position = "jitter", size = 1) +
+  xlab("Protein Rank") + ylab("Abundance")  +
+  scale_y_continuous(trans='log10', breaks = c(0.001,1, 1E3, 1E6), labels = c("ng/L","µg/L","mg/L","g/L")) + #
+  xlim(c(1,3100)) + #ylim(c(-100,1E6)) + 
+  ggtitle("Human Protein Atlas 2017", "MISEV2018 Categories") +
+  theme(legend.position="none") + facet_wrap(~Category) +
+  scale_color_manual(values = colors)
+p3
+```
+

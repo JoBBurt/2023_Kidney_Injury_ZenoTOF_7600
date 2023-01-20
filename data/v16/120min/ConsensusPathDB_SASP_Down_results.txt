@@ -1,0 +1,26 @@
+p-value	q-value	term_goid	term_category	term_level	term_name	members_input_overlap	members_input_overlap_geneids	size	effective_size
+5.41E-07	2.22E-05	GO:0051186	b	3	cofactor metabolic process	11676; 17448; 17449; 20655; 109801; 58810	Sod1; Akr1a1; Mdh2; Mdh1; Glo1; Aldoc	515	71
+9.49E-06	0.000194531	GO:0005975	b	3	carbohydrate metabolic process	11676; 17448; 17449; 109801; 58810	Glo1; Aldoc; Akr1a1; Mdh2; Mdh1	569	59
+3.87E-05	0.000116159	GO:0016615	m	4	malate dehydrogenase activity	17448; 17449	Mdh2; Mdh1	7	2
+0.000230831	0.002379828	GO:0006099	b	3	tricarboxylic acid cycle	17448; 17449	Mdh2; Mdh1	31	4
+0.000145427	0.00021814	GO:0016616	m	4	"oxidoreductase activity, acting on the CH-OH group of donors, NAD or NADP as acceptor"	17448; 17449; 58810	Akr1a1; Mdh2; Mdh1	136	18
+0.000232178	0.002379828	GO:0006082	b	3	organic acid metabolic process	11676; 17448; 17449; 109801; 58810	Glo1; Aldoc; Akr1a1; Mdh2; Mdh1	989	112
+0.000201988	0.001211926	GO:0016614	m	3	"oxidoreductase activity, acting on CH-OH group of donors"	17448; 17449; 58810	Akr1a1; Mdh2; Mdh1	146	20
+0.000900935	0.007387666	GO:0017144	b	3	drug metabolic process	11676; 17448; 17449; 20655	Aldoc; Mdh2; Mdh1; Sod1	740	79
+0.002997279	0.020481409	GO:0006091	b	3	generation of precursor metabolites and energy	11676; 17448; 17449	Aldoc; Mdh2; Mdh1	416	49
+0.00389907	0.022837407	GO:0006081	b	3	cellular aldehyde metabolic process	109801; 58810	Glo1; Akr1a1	72	15
+0.009057954	0.04170825	GO:0044283	b	3	small molecule biosynthetic process	11676; 20655; 58810	Aldoc; Akr1a1; Sod1	669	72
+0.00915547	0.04170825	GO:0006575	b	3	cellular modified amino acid metabolic process	20655; 109801	Glo1; Sod1	167	23
+0.000125745	0.001962059	GO:0006732	b	4	coenzyme metabolic process	11676; 17448; 17449; 58810	Aldoc; Akr1a1; Mdh2; Mdh1	341	48
+0.000194274	0.001962059	GO:0043436	b	4	oxoacid metabolic process	11676; 17448; 17449; 109801; 58810	Glo1; Aldoc; Akr1a1; Mdh2; Mdh1	959	108
+0.000201988	0.001962059	GO:0016999	b	4	antibiotic metabolic process	17448; 17449; 20655	Mdh2; Mdh1; Sod1	147	20
+0.000230831	0.001962059	GO:0046185	b	4	aldehyde catabolic process	109801; 58810	Glo1; Akr1a1	14	4
+0.003241543	0.0226908	GO:0005739	c	4	mitochondrion	11676; 15528; 17448; 17449; 20655	Aldoc; Mdh1; Mdh2; Hspe1; Sod1	1815	194
+0.000354449	0.002410251	GO:0072524	b	4	pyridine-containing compound metabolic process	11676; 17448; 17449	Aldoc; Mdh2; Mdh1	163	24
+0.004441739	0.013325216	GO:0051087	m	3	chaperone binding	15528; 20655	Hspe1; Sod1	98	16
+0.001362902	0.007438378	GO:0006749	b	4	glutathione metabolic process	20655; 109801	Glo1; Sod1	52	9
+0.001531431	0.007438378	GO:0051188	b	4	cofactor biosynthetic process	11676; 20655; 58810	Aldoc; Akr1a1; Sod1	253	39
+0.006942586	0.028298724	GO:0045333	b	4	cellular respiration	17448; 17449	Mdh2; Mdh1	177	20
+0.007703513	0.028298724	GO:0006753	b	4	nucleoside phosphate metabolic process	11676; 17448; 17449	Aldoc; Mdh2; Mdh1	599	68
+0.00838639	0.028298724	GO:0016052	b	4	carbohydrate catabolic process	11676; 58810	Aldoc; Akr1a1	145	22
+0.00915547	0.028298724	GO:0097237	b	4	cellular response to toxic substance	20655; 58810	Akr1a1; Sod1	247	23

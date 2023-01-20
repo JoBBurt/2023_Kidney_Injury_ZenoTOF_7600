@@ -1,0 +1,204 @@
+---
+title: "Appendix 01"
+author: "Jordan Burton"
+date: "8/1/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = F)
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(ggpubr)
+library(RColorBrewer)
+library(plotly)
+library(limma)
+library(qvalue)
+library(tidyverse)
+library(gridExtra)
+library(ggrepel)
+library(gplots)
+library(knitr)
+library(piano)
+library(conflicted)
+library(mixOmics)
+library(clusterProfiler)
+library(AnnotationHub)
+library(org.Hs.eg.db)
+library(VennDiagram)
+library(eulerr)
+theme_set(theme_bw(base_size = 18))
+mycolors <- c("Blue", "Red", "Gray")
+names(mycolors) <- c("Blue", "Red", "Gray")
+```
+
+```{r conflict, include = FALSE}
+conflict_prefer("summarize", "dplyr")
+conflict_prefer("filter", "dplyr")
+conflict_prefer("select", "dplyr")
+conflict_prefer("mutate", "dplyr")
+conflict_prefer("arrange", "dplyr")
+```
+
+```{r load data}
+pro_20_lib_all <- read.csv("data/v16/20min/22_0520_SSL2_ND_InjvsNon_20minDIA_120minLib_v01_Report_Birgit_Protein_Quant_Pivot.csv", stringsAsFactors = F)
+
+pro_120_lib_all <- read.csv("data/v16/120min/2022_0513_SSL2_ND_InjvsNon_120min_Spec16_Library_v01_Report_Birgit.csv", stringsAsFactors = F)
+```
+
+```{r}
+two_venn_pro <- function(df1, df2, myfile1, myfile2){
+  #Creating the lists to compare
+  R1 <- df1$PG.Genes
+  R2 <- df2$PG.Genes
+
+##----- 2-way Venn diagram
+
+   # Rename the lists according to your data set
+overlap <- calculate.overlap(x = list("20 min" = R1, "120 min" = R2))
+
+   # Generating and exporting the Venn diagram WITH legends
+venn.diagram(x = list("20 min" = R1, "120 min" = R2), #Rename according to the names given in line 57 "overlap"
+             filename = myfile1, 
+             main = "UniProtID", main.fontface = "bold", main.fontfamily = "sans", #Title on the plot + font
+             main.cex = 1.6, main.pos = c(0.5,0.8), #Title size + position
+             cex = 1, label.col = "grey9", label.fontfamily = "sans", #Legend size, color and font
+             cat.cex = 1.1, cat.col = c("blue", "green"), cat.just = list(c(0.07,-4.5), c(0.7,-5)), #Size + color + position on the plot of the circle labels
+             cat.default.pos = "outer", cat.fontfamily = "sans", #Position related to the circles + font of the circle labels
+             print.mode = "raw", direct.area = TRUE, area.vector = c(length(overlap$a1), length(overlap$a2), length(overlap$a3)), #what to plot
+             fill = c("blue", "green"), alpha = 0.3, #Filling color of the circles
+             col = c("blue", "green"), lwd = 2, #Outline color of the circles
+             height = 2000, width = 2000, #Size of the plot
+             margin = 0.31)
+
+   # Generating and exporting the Venn diagram WITHOUT any legends
+venn.diagram(x = list("20 min" = R1, "120 min" = R2), 
+             filename = myfile2,
+             cex = 1, label.col = "transparent", label.fontfamily = "sans",
+             cat.cex = 1.1, cat.col =  "transparent", cat.just = list(c(0.07,-4.5), c(0.7,-5)),
+             cat.default.pos = "outer", cat.fontfamily = "sans",
+             print.mode = "raw", direct.area = TRUE, area.vector = c(length(overlap$a1), length(overlap$a2), length(overlap$a3)),
+             fill = c("blue", "green"), alpha = 0.3,
+             col = c("blue", "green"), lwd = 2,
+             height = 2000, width = 2000,
+             margin = 0)
+return(list(overlap = overlap))
+}
+
+pro_20_lib_all$PG.Genes <- tolower(pro_20_lib_all$PG.Genes)
+pro_120_lib_all$PG.Genes <- tolower(pro_120_lib_all$PG.Genes)
+
+overlap <- calculate.overlap(x = list("20 min" = pro_20_lib_all$PG.Genes, "120 min" = pro_120_lib_all$PG.Genes))
+overlap <- two_venn_pro(df1 = pro_20_lib_all, df2 = pro_120_lib_all, myfile1 = "output/venn/20minvs120min/annotated.tiff", myfile2 =  "output/venn/20minvs120min/unannotated.tiff")
+
+write.csv(anti_join(pro_120_lib_all, pro_20_lib_all, by = "PG.Genes"),
+          file = "output/venn/20minvs120min/120min_only.csv")
+
+write.csv(anti_join(pro_20_lib_all, pro_120_lib_all, by = "PG.Genes"),
+          file = "output/venn/20minvs120min/20min_only.csv")
+
+write.csv(semi_join(pro_20_lib_all, pro_120_lib_all, by = "PG.Genes"),
+          file = "output/venn/20minvs120min/overlap.csv")
+```
+
+```{r}
+#120 min Inj or Non comparison
+pro_120_inj <- read.csv("~/Desktop/ZenoTOF SSL2 Processed data/Spectronaut_Version_Comparison/data/v16/Separate_120min/22_0722_SSL2_ND_120min_Inj_Library_v01_Report_Birgit_Protein Quant_Pivot.csv", stringsAsFactors = F)
+pro_120_non <- read.csv("~/Desktop/ZenoTOF SSL2 Processed data/Spectronaut_Version_Comparison/data/v16/Separate_120min/22_0722_SSL2_ND_120min_Non_Library_v01_Report_Birgit_Protein Quant_Pivot.csv", stringsAsFactors = F)
+pro_120_inj$PG.Genes <- tolower(pro_120_inj$PG.Genes)
+pro_120_non$PG.Genes <- tolower(pro_120_non$PG.Genes)
+```
+
+```{r}
+two_venn_pro <- function(df1, df2, myfile1, myfile2){
+  #Creating the lists to compare
+  R1 <- df1$PG.Genes
+  R2 <- df2$PG.Genes
+
+##----- 2-way Venn diagram
+
+   # Rename the lists according to your data set
+overlap <- calculate.overlap(x = list("Inj" = R1, "Cont" = R2))
+
+   # Generating and exporting the Venn diagram WITH legends
+venn.diagram(x = list("INj" = R1, "Cont" = R2), #Rename according to the names given in line 57 "overlap"
+             filename = myfile1, 
+             main = "UniProtID", main.fontface = "bold", main.fontfamily = "sans", #Title on the plot + font
+             main.cex = 1.6, main.pos = c(0.5,0.8), #Title size + position
+             cex = 1, label.col = "grey9", label.fontfamily = "sans", #Legend size, color and font
+             cat.cex = 1.1, cat.col = c("red", "blue"), cat.just = list(c(0.07,-4.5), c(0.7,-5)), #Size + color + position on the plot of the circle labels
+             cat.default.pos = "outer", cat.fontfamily = "sans", #Position related to the circles + font of the circle labels
+             print.mode = "raw", direct.area = TRUE, area.vector = c(length(overlap$a1), length(overlap$a2), length(overlap$a3)), #what to plot
+             fill = c("red", "blue"), alpha = 0.3, #Filling color of the circles
+             col = c("red", "blue"), lwd = 2, #Outline color of the circles
+             height = 2000, width = 2000, #Size of the plot
+             margin = 0.31)
+
+   # Generating and exporting the Venn diagram WITHOUT any legends
+venn.diagram(x = list("Inj" = R1, "Cont" = R2), 
+             filename = myfile2,
+             cex = 1, label.col = "transparent", label.fontfamily = "sans",
+             cat.cex = 1.1, cat.col =  "transparent", cat.just = list(c(0.07,-4.5), c(0.7,-5)),
+             cat.default.pos = "outer", cat.fontfamily = "sans",
+             print.mode = "raw", direct.area = TRUE, area.vector = c(length(overlap$a1), length(overlap$a2), length(overlap$a3)),
+             fill = c("red", "blue"), alpha = 0.3,
+             col = c("red", "blue"), lwd = 2,
+             height = 2000, width = 2000,
+             margin = 0)
+return(list(overlap = overlap))
+}
+
+overlap <- two_venn_pro(df1 = pro_120_inj, df2 = pro_120_non, myfile1 = "output/venn/120min_separate/annotated.tiff", myfile2 =  "output/venn/120min_separate/unannotated.tiff")
+
+write.csv(anti_join(pro_120_inj, pro_120_non, by = "PG.Genes"),
+          file = "output/venn/120min_separate/120min_inj_only.csv")
+
+write.csv(anti_join(pro_120_non, pro_120_inj, by = "PG.Genes"),
+          file = "output/venn/120min_separate/120min_non_only.csv")
+
+write.csv(semi_join(pro_120_inj, pro_120_non, by = "PG.Genes"),
+          file = "output/venn/120min_separate/overlap.csv")
+```
+
+```{r}
+# data import
+conflict_prefer("filter", "dplyr")
+conflict_prefer("desc", "dplyr")
+df <- read.csv("~/Desktop/ZenoTOF SSL2 Processed data/Spectronaut_Version_Comparison/output/venn/120min_separate/ConsensusPathDB_120min_Non_results.csv", 
+               stringsAsFactors = F)
+
+###############Biological Processes Dotplot with ggplot##############
+# filter data for plotting
+data <- df %>%
+  filter(q.value<0.01) %>%
+  filter(term_category=="b") %>% #term category 
+  #b = biological process, c = cellular component, m = molecular function
+  filter(term_level>=3) %>%
+  arrange(desc(GeneRatio))
+
+top10 <- top_n(data, n = 10) # select the top10 pathways to display if applicable
+
+
+tiff("output/venn/120min_separate/Non_Biological_Processes.tiff", 
+     units="in", width=8, height=5, res=300)
+
+S1 <- ggplot(top10, aes(x=GeneRatio , y=factor(pathway, levels=rev(pathway)), 
+                        size=count, color=q.value)) + geom_point(alpha = 0.8) + 
+  theme_classic()
+S1 
+
+S1 = S1+scale_color_gradient(low = "red2",  
+                             high = "mediumblue", space = "Lab",
+                             limit = c(min(data$q.value), 
+                             max(data$q.value)))
+S1 + scale_y_discrete(name="") +
+  scale_size(range = c(2, 6)) +
+  theme(axis.title.x = element_text(size=16),
+        axis.text.x  = element_text(size=14, angle = 90,
+                                    vjust = 0.5, hjust=1),
+        axis.text.y = element_text(size=10))
+
+dev.off()
+
+```

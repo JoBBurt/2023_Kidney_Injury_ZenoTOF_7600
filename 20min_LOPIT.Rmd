@@ -1,0 +1,113 @@
+---
+title: "20 min LOPIT Plot"
+author: "Jordan Burton"
+date: "01/10/2023"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+options(stringsAsFactors = F)
+knitr::opts_chunk$set(warning = FALSE, echo = FALSE)
+library(tidyverse)
+library(reshape2)
+library(ggplot2)
+library(gridExtra)
+library(piano)
+library(pRoloc)
+library(pRolocdata)
+library(Rtsne)
+library(gplots)
+library(RColorBrewer)
+library(knitr)
+library(kableExtra)
+library(plotly)
+library(ggpubr)
+library(dplyr)
+theme_set(theme_bw(base_size = 12))
+update_geom_defaults("point", list(size = 0.7))
+```
+
+## Organellar Profiling via Mass Spectrometry
+
+```{r hyperLOPIT2015, include = FALSE}
+## https://pubmed.ncbi.nlm.nih.gov/26754106/
+data("hyperLOPIT2015")
+set.seed(11)
+p <- plot2D(hyperLOPIT2015, method = "t-SNE")
+#nrow(p)
+```
+
+```{r LOPIT Reference}
+## Formatting the data and plotting the hyperlopit data
+u2os <- data.frame(Accession = row.names(p), p, assignment = as.character(fData(hyperLOPIT2015)$final.assignment), stringsAsFactors = FALSE)
+u2os$Accession <- sapply(strsplit(u2os$Accession, "-"),'[', 1)
+u2osSummary <- u2os %>% group_by(assignment) %>% count()
+textFrame <- data.frame(x = c(-5, 5, -15, -33, 34, 7, 8, -5, 44, 25, 0, 17, -20, -25), 
+                        y = c(18, 5, -6, -2, -20, -39.5, -27, -41, 4, 30, 45, -3, -31, 23), 
+                        text = c("40S Ribosome", "60S Ribosome", "Actin Cytoskeleton", "Cytosol", "Endoplasmic Reticulum/\nGolgi Apparatus", "Endosome", "Extracellular Matrix", "Lysosome", "Mitochondria", "Nucleus Chromatin", "Nucleus Non-Chromatin", "Peroxisome", "Plasma Membrane", "Proteasome"))
+
+mycolors <- c("#E31A1C", "#D95F02", "#70b38d", "#A6CEE3", "#B15928", "#B2DF8A","#3328b1", "#FB9A99", "#1B9E77", "#FDBF6F", "#FF7F00", "#6A3D9A", "#CAB2D6", "#dbdb4b", "#3328b1")
+
+hyperLOPIT <- u2os %>%
+  mutate(annotated = assignment != "unknown") %>%
+  ggplot(aes(x = Dimension.1, y = Dimension.2)) +
+  geom_point(data = function(x){x[!(x$annotated), ]}, color = grey(0.9)) +
+  geom_point(data = function(x){x[(x$annotated), ]}, aes(color = assignment)) +
+  geom_text(data = textFrame, aes(x = x, y = y, label = text), size = 3.5) +
+  scale_color_manual(values = mycolors) +
+  labs(color = "Localization", x = "t-SNE Dim. 1", y = "t-SNE Dim. 2") +
+  theme(#axis.text.x = element_blank(),
+        #axis.text.y = element_blank(),
+        #axis.ticks = element_blank(), 
+        legend.position = 'none')
+
+hyperLOPIT
+
+#ggsave(hyperLOPIT, file = "output/Figure_1.svg", height = 2.5, width = 3)
+#ggsave(hyperLOPIT, file = "output/Figure_1.png", height = 2.5, width = 3)
+#ggsave(hyperLOPIT, file = "output/LOPIT/reference.tiff", dpi = 300)
+```
+
+```{r prepare data}
+can_20_lib <- read.csv("data/v16/20min/22_0520_SSL2_ND_InjvsNon_20minDIA_120minLib_v01_candidates.csv", stringsAsFactors = F)
+
+candidates <- function(df){
+df$minuslogqval <- -1*log10(df$Qvalue)
+df$Color <- ifelse(df$AVG.Log2.Ratio >= 0.58 & df$Qvalue < 0.01, "Red", "Grey")
+df$Color <- ifelse(df$AVG.Log2.Ratio <= -0.58 & df$Qvalue < 0.01, "Blue", df$Color)
+df$Label <- NA
+return(df)
+}
+
+can_20_lib <- candidates(can_20_lib)
+u2os$inCan <- u2os$Accession %in% can_20_lib$UniProtIds #1721 proteins
+u2osCan <- can_20_lib %>%
+  full_join(u2os, by = c("UniProtIds" = "Accession"))
+```
+
+```{r plot data}
+textFrame <- data.frame(x = c(-5, 5, -15, -33, 28, 7, 7, -5, 40, 25, 0, 17, -20, -28), 
+                        y = c(18, 5, -6, -2, -20, -39.5, -26, -41, 4, 25, 45, -3, -31, 23), 
+                        text = c("40S R", "60S R", "AC", "Cyt", "ER/GA", "End", "EM", "Lys", "Mito", "Nuc-Chr", "Nuc Non-Chr", "Per", "PM", "Pro"))
+
+canSummary <- u2osCan %>%
+  mutate(identified = !is.na(u2osCan$inCan)) %>%
+  filter(inCan == TRUE) %>%
+  group_by(assignment) %>% count()
+canLOPIT <- u2osCan %>%
+  mutate(identified = !is.na(u2osCan$inCan)) %>%
+  ggplot(aes(x = Dimension.1, y = Dimension.2)) +
+  geom_point(alpha = 0.1) +
+  geom_point(data = u2osCan[!is.na(u2osCan$Absolute.AVG.Log2.Ratio), ], aes(x = Dimension.1, y = Dimension.2, size = Absolute.AVG.Log2.Ratio),
+             color = u2osCan[!is.na(u2osCan$Absolute.AVG.Log2.Ratio), ]$Color, alpha = 0.3) +
+  #scale_size_manual(values = c(0.18, 0.375, .75, 1.5)) +
+  labs(color = "Localization", title = "Injured vs. Control", x = "t-SNE Dim. 1", y = "t-SNE Dim. 2") +
+  theme(#axis.text.x = element_blank(),
+        #axis.text.y = element_blank(),
+        #axis.ticks = element_blank(),
+        legend.position = c(0.88, 0.83)) +
+  guides(size=guide_legend(title="|log2(FC)| Ratio")) +
+  geom_text(data = textFrame, aes(x = x, y = y, label = text), size = 4.5)
+ggsave(canLOPIT, file = "output/LOPIT/20min_candidate_text.tiff", dpi = 300)
+```
+

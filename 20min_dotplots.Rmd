@@ -1,0 +1,227 @@
+---
+title: "20 min Library Search ConsensusPathDB"
+author: "Jordan Burton"
+date: "5/23/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = F)
+library(clusterProfiler)
+library(AnnotationHub)
+library(org.Hs.eg.db)
+library(ggplot2)
+library(dplyr)
+```
+
+```{r}
+# data import
+
+df <- read.csv("data/v16/20min/20min_Up_ConsensusPathDB.csv", 
+               stringsAsFactors = F)
+
+###############Biological Processes Dotplot with ggplot##############
+# filter data for plotting
+data <- df %>%
+  filter(q.value<0.01) %>%
+  filter(term_category=="b") %>% #term category 
+  #b = biological process, c = cellular component, m = molecular function
+  filter(term_level>=4) %>%
+  arrange(desc(GeneRatio))
+
+top10 <- top_n(data, n = 10) # select the top10 pathways to display if applicable
+
+
+tiff("output/dotplots/20min_Up_Biological_Processes_new.tiff", 
+     units="in", width=8, height=5, res=300)
+
+S1 <- ggplot(top10, aes(x=GeneRatio , y=factor(pathway, levels=rev(pathway)), 
+                        size=count, color=q.value)) + geom_point(alpha = 0.8) + 
+  theme_classic()
+S1 
+
+S1 = S1+scale_color_gradient(low = "red2",  
+                             high = "mediumblue", space = "Lab",
+                             limit = c(min(data$q.value), 
+                             max(data$q.value)))
+S1 + scale_y_discrete(name="") +
+  scale_size(range = c(2, 6)) +
+  theme(axis.title.x = element_text(size=16),
+        axis.text.x  = element_text(size=14, angle = 90,
+                                    vjust = 0.5, hjust=1),
+        axis.text.y = element_text(size=10))
+
+dev.off()
+
+###############Molecular Functions Dotplot with ggplot##############
+# filter data for plotting
+data <- df %>%
+  filter(q.value<0.01) %>%
+  filter(term_category=="m") %>% #term category 
+  #b = biological process, c = cellular component, m = molecular function
+  filter(term_level>=4) %>%
+  arrange(desc(GeneRatio))
+
+top10 <- top_n(data, n = 10) # select the top10 pathways to display if applicable
+
+
+tiff("output/dotplots/20min_Up_Molecular_Functions.tiff", 
+     units="in", width=8, height=5, res=300)
+
+S1 <- ggplot(top10, aes(x=GeneRatio , y=factor(pathway, levels=rev(pathway)), 
+                        size=count, color=q.value)) + geom_point(alpha = 0.8) + 
+  theme_classic()
+S1 
+
+S1 = S1+scale_color_gradient(low = "red2",  
+                             high = "mediumblue", space = "Lab",
+                             limit = c(min(data$q.value), 
+                             max(data$q.value)))
+S1 + scale_y_discrete(name="") +
+  scale_size(range = c(2, 6)) +
+  theme(axis.title.x = element_text(size=16),
+        axis.text.x  = element_text(size=14, angle = 90,
+                                    vjust = 0.5, hjust=1),
+        axis.text.y = element_text(size=10))
+
+dev.off()
+
+###############Cellular Components Dotplot with ggplot##############
+# filter data for plotting
+data <- df %>%
+  filter(q.value<0.01) %>%
+  filter(term_category=="c") %>% #term category 
+  #b = biological process, c = cellular component, m = molecular function
+  filter(term_level>=4) %>%
+  arrange(desc(GeneRatio))
+
+top10 <- top_n(data, n = 10) # select the top10 pathways to display if applicable
+
+
+tiff("output/dotplots/20min_Up_Cellular_Components.tiff", 
+     units="in", width=8, height=5, res=300)
+
+S1 <- ggplot(top10, aes(x=GeneRatio , y=factor(pathway, levels=rev(pathway)), 
+                        size=count, color=q.value)) + geom_point(alpha = 0.8) + 
+  theme_classic()
+S1 
+
+S1 = S1+scale_color_gradient(low = "red2",  
+                             high = "mediumblue", space = "Lab",
+                             limit = c(min(data$q.value), 
+                             max(data$q.value)))
+S1 + scale_y_discrete(name="") +
+  scale_size(range = c(2, 6)) +
+  theme(axis.title.x = element_text(size=16),
+        axis.text.x  = element_text(size=14, angle = 90,
+                                    vjust = 0.5, hjust=1),
+        axis.text.y = element_text(size=10))
+
+dev.off()
+```
+
+```{r}
+# data import
+
+df <- read.csv("data/v16/20min/20min_Down_ConsensusPathDB.csv", 
+               stringsAsFactors = F)
+
+###############Biological Processes Dotplot with ggplot##############
+# filter data for plotting
+data <- df %>%
+  filter(q.value<0.01) %>%
+  filter(term_category=="b") %>% #term category 
+  #b = biological process, c = cellular component, m = molecular function
+  filter(term_level>=4) %>%
+  arrange(desc(GeneRatio))
+
+top10 <- top_n(data, n=10) # select the top10 pathways to display if applicable
+
+
+tiff("output/dotplots/20min_Down_Biological_Processes_new.tiff", 
+     units="in", width=8, height=5, res=300)
+
+S1 <- ggplot(top10, aes(x=GeneRatio , y=factor(pathway, levels=rev(pathway)), 
+                        size=count, color=q.value)) + geom_point(alpha = 0.8) + 
+  theme_classic()
+S1 
+
+S1 = S1+scale_color_gradient(low = "red2",  
+                             high = "mediumblue", space = "Lab",
+                             limit = c(min(data$q.value), 
+                             max(data$q.value)))
+S1 + scale_y_discrete(name="") +
+  scale_size(range = c(2, 6)) +
+  theme(axis.title.x = element_text(size=16),
+        axis.text.x  = element_text(size=14, angle = 90,
+                                    vjust = 0.5, hjust=1),
+        axis.text.y = element_text(size=10))
+
+dev.off()
+
+###############Molecular Functions Dotplot with ggplot##############
+# filter data for plotting
+data <- df %>%
+  filter(q.value<0.01) %>%
+  filter(term_category=="m") %>% #term category 
+  #b = biological process, c = cellular component, m = molecular function
+  filter(term_level>=3) %>%
+  arrange(desc(GeneRatio))
+
+top10 <- top_n(data, n = 10) # select the top10 pathways to display if applicable
+
+
+tiff("output/dotplots/20min_Down_Molecular_Functions.tiff", 
+     units="in", width=8, height=5, res=300)
+
+S1 <- ggplot(top10, aes(x=GeneRatio , y=factor(pathway, levels=rev(pathway)), 
+                        size=count, color=q.value)) + geom_point(alpha = 0.8) + 
+  theme_classic()
+S1 
+
+S1 = S1+scale_color_gradient(low = "red2",  
+                             high = "mediumblue", space = "Lab",
+                             limit = c(min(data$q.value), 
+                             max(data$q.value)))
+S1 + scale_y_discrete(name="") +
+  scale_size(range = c(2, 6)) +
+  theme(axis.title.x = element_text(size=16),
+        axis.text.x  = element_text(size=14, angle = 90,
+                                    vjust = 0.5, hjust=1),
+        axis.text.y = element_text(size=10))
+
+dev.off()
+
+###############Cellular Components Dotplot with ggplot##############
+# filter data for plotting
+data <- df %>%
+  filter(q.value<0.01) %>%
+  filter(term_category=="c") %>% #term category 
+  #b = biological process, c = cellular component, m = molecular function
+  filter(term_level>=3) %>%
+  arrange(desc(GeneRatio))
+
+top10 <- top_n(data, n = 10) # select the top10 pathways to display if applicable
+
+
+tiff("output/dotplots/20min_Down_Cellular_Components.tiff", 
+     units="in", width=8, height=5, res=300)
+
+S1 <- ggplot(top10, aes(x=GeneRatio , y=factor(pathway, levels=rev(pathway)), 
+                        size=count, color=q.value)) + geom_point(alpha = 0.8) + 
+  theme_classic()
+S1 
+
+S1 = S1+scale_color_gradient(low = "red2",  
+                             high = "mediumblue", space = "Lab",
+                             limit = c(min(data$q.value), 
+                             max(data$q.value)))
+S1 + scale_y_discrete(name="") +
+  scale_size(range = c(2, 6)) +
+  theme(axis.title.x = element_text(size=16),
+        axis.text.x  = element_text(size=14, angle = 90,
+                                    vjust = 0.5, hjust=1),
+        axis.text.y = element_text(size=10))
+
+dev.off()
+```
